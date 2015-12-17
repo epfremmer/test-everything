@@ -14,6 +14,8 @@ use Symfony\Component\Process\Process;
 
 class ProcessQueue extends Collection
 {
+    const SLEEP_MICRO_SECONDS = 1000;
+
     /**
      * @var int
      */
@@ -84,7 +86,7 @@ class ProcessQueue extends Collection
     public function __invoke()
     {
         while (!$this->isEmpty()) {
-            usleep(500000);
+            usleep(self::SLEEP_MICRO_SECONDS);
 
             $pending = $this->getPending();
 
