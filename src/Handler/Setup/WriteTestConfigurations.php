@@ -6,14 +6,13 @@
  * Time: 12:52 AM
  */
 
-namespace Epfremme\Everything\Handler;
+namespace Epfremme\Everything\Handler\Setup;
 
 
 use Epfremme\Collection\Collection;
 use Epfremme\Everything\Composer\Json;
-use Epfremme\Everything\Composer\Package;
+use Epfremme\Everything\Entity\Package;
 use Epfremme\Everything\FileSystem\Cache;
-use Symfony\Component\Console\Helper\ProgressBar;
 
 class WriteTestConfigurations
 {
@@ -26,10 +25,6 @@ class WriteTestConfigurations
      * @var Cache
      */
     private $cache;
-    /**
-     * @var ProgressBar
-     */
-    private $progress;
 
     /**
      * @var Json
@@ -41,14 +36,12 @@ class WriteTestConfigurations
      *
      * @param Collection $packages
      * @param Cache $cache
-     * @param ProgressBar $progress
      * @param Json $json
      */
-    public function __construct(Collection $packages, Cache $cache, ProgressBar $progress, Json $json)
+    public function __construct(Collection $packages, Cache $cache, Json $json)
     {
         $this->packages = $packages;
         $this->cache = $cache;
-        $this->progress = $progress;
         $this->json = $json;
     }
 
@@ -60,14 +53,12 @@ class WriteTestConfigurations
     {
         $this->packages->each(function(Package $package) use ($base) {
             foreach ($package->getVersions() as $version => $info) {
-                $baseConfig = $base->getArrayCopy();
+                $require = $base->getArrayCopy();
 
-                $baseConfig[$package->getName()] = $version;
+                $require[$package->getName()] = $version;
 
-                $this->json->setRequire($baseConfig);
-
+                $this->json->setRequire($require);
                 $this->cache->addConfig($this->json);
-                $this->progress->advance();
             }
         });
 

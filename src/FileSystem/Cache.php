@@ -10,6 +10,7 @@ use Epfremme\Collection\Collection;
 use Epfremme\Everything\Composer\Json;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Class Cache
@@ -26,17 +27,11 @@ class Cache
     private $fs;
 
     /**
-     * @var Collection
-     */
-    private $configs;
-
-    /**
      * Cache constructor
      */
     public function __construct()
     {
         $this->fs = new Filesystem();
-        $this->configs = new Collection();
 
         $this->initCacheDir();
     }
@@ -58,26 +53,54 @@ class Cache
         $json = $config->toJson();
         $hash = sha1($json);
         $file = sprintf('%s/%s/composer.json', self::CACHE_DIR, $hash);
+        $lock = sprintf('%s/%s/composer.lock', self::CACHE_DIR, $hash);
+
+        if ($this->fs->exists($lock)) {
+            $this->fs->remove($lock);
+        }
 
         if (!$this->fs->exists($file)) {
             $this->fs->mkdir(sprintf('%s/%s', self::CACHE_DIR, $hash));
             $this->fs->dumpFile($file, $json);
         }
+
+        return $hash;
     }
 
-    public function link($path)
+    public function mirror(array $paths, \Closure $callback = null)
+    {
+        $this->each(function(SplFileInfo $directory) use ($paths, $callback) {
+            foreach ($paths as $path) {
+                $relativePath = $this->fs->makePathRelative($path, (string) $directory);
+                $originPath = realpath(sprintf('%s/%s', $directory->getRealPath(), $relativePath));
+                $targetPath = sprintf('%s/%s', $directory->getRealPath(), $path);
+
+                $this->fs->mirror($originPath, $targetPath, null, [
+                    'override' => true,
+                    'delete' => true,
+                ]);
+            }
+
+            $callback();
+        });
+    }
+
+    public function each(\Closure $fn)
     {
         $finder = new Finder();
-        $finder->directories()->in(self::CACHE_DIR);
+        $finder->directories()->in(self::CACHE_DIR)->depth(0);
 
         foreach ($finder as $key => $directory) {
             /** @var \SplFileInfo $directory */
-            if ($directory->isLink()) {
-                continue;
-            }
+//            if ($directory->isDir()) {
+//                continue;
+//            }
 
-            $relativePath = $this->fs->makePathRelative($path, (string) $directory);
-            $this->fs->symlink($relativePath, sprintf('%s/%s', $directory, rtrim($path, '/')));
+            if ($fn($directory, $key) === false) {
+                return false;
+            };
         }
+
+        return true;
     }
 }

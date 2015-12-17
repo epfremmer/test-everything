@@ -6,7 +6,7 @@
  * Time: 7:54 PM
  */
 
-namespace Epfremme\Everything\Composer;
+namespace Epfremme\Everything\Entity;
 
 use Epfremme\Everything\Annotation\Inline;
 use JMS\Serializer\Annotation as JMS;

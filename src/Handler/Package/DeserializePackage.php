@@ -6,9 +6,9 @@
  * Time: 7:54 PM
  */
 
-namespace Epfremme\Everything\Handler;
+namespace Epfremme\Everything\Handler\Package;
 
-use Epfremme\Everything\Composer\Package;
+use Epfremme\Everything\Entity\Package;
 use JMS\Serializer\SerializerInterface;
 use Psr\Http\Message\ResponseInterface;
 

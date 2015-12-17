@@ -6,11 +6,11 @@
  * Time: 7:48 PM
  */
 
-namespace Epfremme\Everything\Handler;
+namespace Epfremme\Everything\Handler\Package;
 
 use Composer\Semver\Semver;
 use Composer\Semver\VersionParser;
-use Epfremme\Everything\Composer\Package;
+use Epfremme\Everything\Entity\Package;
 
 class FilterPackageVersions
 {

@@ -2,16 +2,15 @@
 /**
  * Created by IntelliJ IDEA.
  * User: epfremme
- * Date: 12/14/15
- * Time: 11:42 PM
+ * Date: 12/15/15
+ * Time: 12:44 AM
  */
 
-namespace Epfremme\Everything\Handler;
-
+namespace Epfremme\Everything\Handler\Output;
 
 use Symfony\Component\Console\Helper\ProgressBar;
 
-class AdvanceProgressBar
+class StartProgressBar
 {
     /**
      * @var ProgressBar
@@ -19,7 +18,7 @@ class AdvanceProgressBar
     private $progressBar;
 
     /**
-     * AdvanceProgressBar constructor
+     * ResetProgressBar constructor
      *
      * @param ProgressBar $progressBar
      */
@@ -28,15 +27,8 @@ class AdvanceProgressBar
         $this->progressBar = $progressBar;
     }
 
-    /**
-     * Advance progress bar
-     *
-     * @return mixed
-     */
-    public function __invoke()
+    public function __invoke($max = null)
     {
-        $this->progressBar->advance();
-
-        return func_get_arg(0);
+        $this->progressBar->start($max);
     }
 }

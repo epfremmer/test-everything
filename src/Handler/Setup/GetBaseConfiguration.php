@@ -6,11 +6,11 @@
  * Time: 12:50 AM
  */
 
-namespace Epfremme\Everything\Handler;
+namespace Epfremme\Everything\Handler\Setup;
 
 
 use Epfremme\Collection\Collection;
-use Epfremme\Everything\Composer\Package;
+use Epfremme\Everything\Entity\Package;
 
 class GetBaseConfiguration
 {

@@ -16,8 +16,10 @@ use Symfony\Component\Console\Input\InputInterface;
  *
  * @package Epfremme\Everything
  */
-class Application extends \Liuggio\Fastest\Application
+class Application extends BaseApplication
 {
+    const VERSION = '1.0.0';
+
     /**
      * Application constructor
      *
@@ -25,7 +27,7 @@ class Application extends \Liuggio\Fastest\Application
      */
     public function __construct()
     {
-        BaseApplication::__construct('everything', self::VERSION);
+        parent::__construct('everything', self::VERSION);
 
         AnnotationRegistry::registerLoader('class_exists');
     }
@@ -38,6 +40,9 @@ class Application extends \Liuggio\Fastest\Application
         return 'everything';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getDefaultCommands()
     {
         $defaultCommands = parent::getDefaultCommands();

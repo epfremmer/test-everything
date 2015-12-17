@@ -6,10 +6,10 @@
  * Time: 9:12 PM
  */
 
-namespace Epfremme\Everything\Handler;
+namespace Epfremme\Everything\Handler\Package;
 
 use Epfremme\Collection\Collection;
-use Epfremme\Everything\Composer\Package;
+use Epfremme\Everything\Entity\Package;
 use Epfremme\Everything\FileSystem\Cache;
 
 class StorePackage
@@ -32,5 +32,7 @@ class StorePackage
     public function __invoke(Package $package)
     {
         $this->packages->set($package->getName(), $package);
+
+        return $package;
     }
 }

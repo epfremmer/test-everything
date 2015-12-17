@@ -6,7 +6,7 @@
  * Time: 1:05 AM
  */
 
-namespace Epfremme\Everything\Handler;
+namespace Epfremme\Everything\Handler\Output;
 
 
 use Symfony\Component\Console\Output\OutputInterface;
