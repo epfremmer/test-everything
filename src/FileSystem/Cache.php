@@ -4,7 +4,7 @@
  *
  * @author Edward Pfremmer <epfremme@nerdery.com>
  */
-namespace Epfremme\Everything\FileSystem;
+namespace Epfremme\Everything\Filesystem;
 
 use Epfremme\Everything\Composer\Json;
 use Symfony\Component\Filesystem\Filesystem;
@@ -14,7 +14,7 @@ use Symfony\Component\Finder\SplFileInfo;
 /**
  * Class Cache
  *
- * @package Epfremme\Everything\FileSystem
+ * @package Epfremme\Everything\Filesystem
  */
 class Cache implements \Countable
 {

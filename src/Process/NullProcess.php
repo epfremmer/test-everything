@@ -14,9 +14,7 @@ use Symfony\Component\Process\Process;
 class NullProcess extends Process
 {
     /**
-     * NullProcess constructor
-     *
-     *
+     * {@inheritdoc}
      */
     public function __construct()
     {

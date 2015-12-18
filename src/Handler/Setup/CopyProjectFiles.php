@@ -11,7 +11,7 @@ namespace Epfremme\Everything\Handler\Setup;
 
 use Epfremme\Collection\Collection;
 use Epfremme\Everything\Composer\Json;
-use Epfremme\Everything\FileSystem\Cache;
+use Epfremme\Everything\Filesystem\Cache;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 class CopyProjectFiles

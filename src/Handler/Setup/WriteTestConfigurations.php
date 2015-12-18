@@ -12,7 +12,7 @@ namespace Epfremme\Everything\Handler\Setup;
 use Epfremme\Collection\Collection;
 use Epfremme\Everything\Composer\Json;
 use Epfremme\Everything\Entity\Package;
-use Epfremme\Everything\FileSystem\Cache;
+use Epfremme\Everything\Filesystem\Cache;
 
 class WriteTestConfigurations
 {

@@ -13,7 +13,7 @@ use Epfremme\Everything\Composer\Json;
 use Epfremme\Everything\Counter\PackageVersionCounter;
 use Epfremme\Everything\Entity\TestResult;
 use Epfremme\Everything\Process\ProcessFactory;
-use Epfremme\Everything\FileSystem\Cache;
+use Epfremme\Everything\Filesystem\Cache;
 use Epfremme\Everything\Handler;
 use Epfremme\Everything\Parser\PHPUnitResultsParser;
 use Epfremme\Everything\Process\ProcessManager;
@@ -30,7 +30,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\SplFileInfo;
 
-class TestCommand extends Command
+class EverythingCommand extends Command
 {
     /**
      * @var InputInterface

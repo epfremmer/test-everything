@@ -7,7 +7,7 @@
 namespace Epfremme\Everything;
 
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use Epfremme\Everything\Command\TestCommand;
+use Epfremme\Everything\Command\EverythingCommand;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 
@@ -46,7 +46,7 @@ class Application extends BaseApplication
     protected function getDefaultCommands()
     {
         $defaultCommands = parent::getDefaultCommands();
-        $defaultCommands[] = new TestCommand();
+        $defaultCommands[] = new EverythingCommand();
 
         return $defaultCommands;
     }

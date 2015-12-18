@@ -9,7 +9,7 @@
 namespace Epfremme\Everything\Handler\Setup;
 
 
-use Epfremme\Everything\FileSystem\Cache;
+use Epfremme\Everything\Filesystem\Cache;
 use Symfony\Component\Finder\SplFileInfo;
 
 class WritePhpUnitTestXml
