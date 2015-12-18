@@ -81,6 +81,10 @@ class Json
         return json_encode($this->data, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * @param string $key
+     * @return mixed
+     */
     public function get($key)
     {
         if (!array_key_exists($key, $this->data)) {
@@ -98,10 +102,5 @@ class Json
     public function __toString()
     {
         return $this->toJson();
-    }
-
-    public function __get($key)
-    {
-        return $this->get($key);
     }
 }
