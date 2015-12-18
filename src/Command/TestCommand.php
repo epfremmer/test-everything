@@ -10,6 +10,7 @@ namespace Epfremme\Everything\Command;
 
 use Epfremme\Collection\Collection;
 use Epfremme\Everything\Composer\Json;
+use Epfremme\Everything\Counter\PackageVersionCounter;
 use Epfremme\Everything\Entity\TestResult;
 use Epfremme\Everything\Process\ProcessFactory;
 use Epfremme\Everything\FileSystem\Cache;
@@ -25,31 +26,36 @@ use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Symfony\Component\Console\Helper\ProgressIndicator;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\Process\Process;
 
 class TestCommand extends Command
 {
+    /**
+     * @var InputInterface
+     */
+    private $input;
+
+    /**
+     * @var OutputInterface
+     */
+    private $output;
+
+    /**
+     * @var ProgressBar
+     */
+    private $progress;
+
     /**
      * @var PackagistService
      */
     private $packagistService;
 
     /**
-     * @var Serializer
+     * @var Collection
      */
-    private $serializer;
-
-    /**
-     * @var Cache
-     */
-    private $cache;
+    private $configurations;
 
     /**
      * @var Collection
@@ -67,9 +73,24 @@ class TestCommand extends Command
     private $results;
 
     /**
-     * @var Collection
+     * @var Cache
      */
-    private $configurations;
+    private $cache;
+
+    /**
+     * @var Serializer
+     */
+    private $serializer;
+
+    /**
+     * @var Json
+     */
+    private $json;
+
+    /**
+     * @var \SimpleXmlElement
+     */
+    private $phpunitXml;
 
     /**
      * {@inheritdoc}
@@ -77,19 +98,6 @@ class TestCommand extends Command
     protected function configure()
     {
         parent::configure();
-
-        $serializerBuilder = new SerializerBuilder();
-        $serializerBuilder->configureListeners(function(EventDispatcher $eventDispatcher) {
-            $eventDispatcher->addSubscriber(new SerializationSubscriber());
-        });
-
-        $this->serializer = $serializerBuilder->build();
-        $this->packagistService = new PackagistService();
-        $this->packages = new Collection();
-        $this->promises = new Collection();
-        $this->results = new Collection();
-        $this->configurations = new Collection();
-        $this->cache = new Cache();
 
         $this
             ->setName('everything')
@@ -100,77 +108,45 @@ class TestCommand extends Command
     /**
      * {@inheritDoc}
      */
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        parent::initialize($input, $output);
+
+        $this->input = $input;
+        $this->output = $output;
+
+        $serializerBuilder = new SerializerBuilder();
+        $serializerBuilder->configureListeners(function(EventDispatcher $eventDispatcher) {
+            $eventDispatcher->addSubscriber(new SerializationSubscriber());
+        });
+
+        $this->serializer = $serializerBuilder->build();
+
+        $this->progress = new ProgressBar($this->output);
+        $this->packagistService = new PackagistService();
+        $this->configurations = new Collection();
+        $this->packages = new Collection();
+        $this->promises = new Collection();
+        $this->results = new Collection();
+        $this->cache = new Cache();
+        $this->json = new Json(file_get_contents('composer.json'));
+        $this->phpunitXml = simplexml_load_file('phpunit.xml.dist');
+
+        $this->progress->setFormat('very_verbose');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $json = new Json(file_get_contents('composer.json'));
-        $progress = new ProgressBar($output, count($json->getRequire()));
-        $phpunitXml = simplexml_load_file('phpunit.xml.dist');
+        $this->fetchPackages();
+        $this->prepareTests();
+        $this->runTests();
 
-        $output->writeln('Fetching package versions...');
-        $progress->setFormat('very_verbose');
-        $progress->start();
+        $this->printResults();
 
-        foreach ($json->getRequire() as $package => $constraint) {
-            if (strtolower($package) === 'php') {
-                $progress->advance();
-                continue;
-            }
-
-            $promise = $this->packagistService->getPackage($package)
-                ->then(new Handler\Package\DeserializePackage($this->serializer))
-                ->then(new Handler\Package\FilterPackageVersions($constraint))
-                ->then(new Handler\Package\StorePackage($this->packages))
-                ->then(new Handler\Output\AdvanceProgressBar($progress))
-            ;
-
-            $this->promises->push($promise);
-        }
-
-        $this->resolvePromises()
-            ->then(new Handler\Output\CompleteProgressBar($output, $progress))
-            ->then(new Handler\Output\WriteLine($output, 'Preparing test configurations...'))
-            ->then(new Handler\Package\SortPackages($this->packages))
-            ->then(new Handler\Package\CountPackageVersions($this->packages))
-            ->then(new Handler\Output\StartProgressBar($progress))
-            ->then(new Handler\Setup\GetBaseConfiguration($this->packages))
-            ->then(new Handler\Setup\WriteTestConfigurations($this->packages, $this->cache, $json))
-            ->then(new Handler\Setup\WritePhpUnitTestXml($this->cache, $phpunitXml))
-            ->then(new Handler\Setup\CopyProjectFiles($this->cache, $json, $progress))
-            ->then(new Handler\Output\CompleteProgressBar($output, $progress))
-            ->then(new Handler\Output\WriteLine($output, 'Running distribution tests...'))
-            ->then(new Handler\Package\CountPackageVersions($this->packages))
-            ->then(new Handler\Output\StartProgressBar($progress))
-            ->wait()
-        ;
-
-//        $processFactory = new ProcessFactory('ls');
-        $processFactory = new ProcessFactory('nice composer install -q > /dev/null 2>&1 && bin/phpunit');
-        $processManager = new ProcessManager($processFactory);
-        $resultsParser = new PHPUnitResultsParser();
-
-        $this->cache->each(function(SplFileInfo $directory) use ($processManager, $resultsParser, $progress) {
-            $promise = $processManager->enqueue($directory)
-                ->then(new Handler\Output\AdvanceProgressBar($progress))
-                ->then(new Handler\Test\ParseTestResults($resultsParser))
-                ->then(new Handler\Test\StoreTestResults($this->results))
-                ->otherwise(new Handler\Error\HandleProcessError($this->results))
-            ;
-
-            $this->promises->push($promise);
-        });
-
-        $processManager->run(function() use ($progress) {
-            $progress->display();
-        });
-
-        $this->resolvePromises()
-            ->then(new Handler\Output\CompleteProgressBar($output, $progress))
-            ->then(new Handler\Output\WriteLine($output, 'Printing Test Results...'))
-            ->then(new Handler\Test\PrintResultsTable($this->results, $output))
-            ->wait()
-        ;
-
-        $output->writeln('');
+        $this->output->writeln('');
     }
 
     /**
@@ -185,5 +161,82 @@ class TestCommand extends Command
         $this->promises->clear();
 
         return $all;
+    }
+
+    private function fetchPackages()
+    {
+        $this->output->writeln('Fetching package versions...');
+        $this->progress->start(count($this->json->getRequire()));
+
+        foreach ($this->json->getRequire() as $package => $constraint) {
+            if (strtolower($package) === 'php') {
+                $this->progress->advance();
+                continue;
+            }
+
+            $promise = $this->packagistService->getPackage($package)
+                ->then(new Handler\Package\DeserializePackage($this->serializer))
+                ->then(new Handler\Package\FilterPackageVersions($constraint))
+                ->then(new Handler\Package\StorePackage($this->packages))
+                ->then(new Handler\Output\AdvanceProgressBar($this->progress));
+
+            $this->promises->push($promise);
+        }
+    }
+
+    private function prepareTests()
+    {
+        $counter = new PackageVersionCounter($this->packages);
+
+        $promise = $this->resolvePromises()
+            ->then(new Handler\Output\CompleteProgressBar($this->output, $this->progress))
+            ->then(new Handler\Output\WriteLine($this->output, 'Preparing test configurations...'))
+            ->then(new Handler\Package\SortPackages($this->packages))
+            ->then(new Handler\Output\StartProgressBar($this->progress, $counter))
+            ->then(new Handler\Setup\GetBaseConfiguration($this->packages))
+            ->then(new Handler\Setup\WriteTestConfigurations($this->packages, $this->cache, $this->json))
+            ->then(new Handler\Setup\WritePhpUnitTestXml($this->cache, $this->phpunitXml))
+            ->then(new Handler\Setup\CopyProjectFiles($this->cache, $this->json, $this->progress))
+            ->then(new Handler\Output\CompleteProgressBar($this->output, $this->progress))
+            ->wait();
+
+        $this->promises->push($promise);
+    }
+
+    private function runTests()
+    {
+        $processFactory = new ProcessFactory('ls');
+//        $processFactory = new ProcessFactory('nice composer install -q > /dev/null 2>&1 && bin/phpunit');
+//        $processFactory = new ProcessFactory('nice bin/phpunit');
+        $processManager = new ProcessManager($processFactory);
+        $resultsParser = new PHPUnitResultsParser();
+
+        $this->resolvePromises()
+            ->then(new Handler\Output\WriteLine($this->output, 'Running distribution tests...'))
+            ->then(new Handler\Output\StartProgressBar($this->progress, $this->cache))
+            ->wait();
+
+        $this->cache->each(function (SplFileInfo $directory) use ($processManager, $resultsParser) {
+            $promise = $processManager->enqueue($directory)
+                ->then(new Handler\Output\AdvanceProgressBar($this->progress))
+                ->then(new Handler\Test\ParseTestResults($resultsParser))
+                ->then(new Handler\Test\StoreTestResults($this->results))
+                ->otherwise(new Handler\Error\HandleProcessError($this->results));
+
+            $this->promises->push($promise);
+        });
+
+        $processManager->run(function () {
+            $this->progress->display();
+        });
+    }
+
+    private function printResults()
+    {
+        $this->resolvePromises()
+            ->then(new Handler\Output\CompleteProgressBar($this->output, $this->progress))
+            ->then(new Handler\Output\WriteLine($this->output, 'Printing Test Results...'))
+            ->then(new Handler\Test\PrintResultsTable($this->results, $this->output))
+            ->wait();
     }
 }

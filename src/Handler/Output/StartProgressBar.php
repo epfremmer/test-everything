@@ -18,17 +18,26 @@ class StartProgressBar
     private $progressBar;
 
     /**
+     * @var \Countable
+     */
+    private $countable;
+
+    /**
      * ResetProgressBar constructor
      *
      * @param ProgressBar $progressBar
+     * @param \Countable $countable
      */
-    public function __construct(ProgressBar $progressBar)
+    public function __construct(ProgressBar $progressBar, \Countable $countable = null)
     {
         $this->progressBar = $progressBar;
+        $this->countable = $countable;
     }
 
-    public function __invoke($max = null)
+    public function __invoke()
     {
+        $max = $this->countable ? $this->countable->count() : null;
+
         $this->progressBar->start($max);
     }
 }

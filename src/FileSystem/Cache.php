@@ -6,7 +6,6 @@
  */
 namespace Epfremme\Everything\FileSystem;
 
-use Epfremme\Collection\Collection;
 use Epfremme\Everything\Composer\Json;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -17,7 +16,7 @@ use Symfony\Component\Finder\SplFileInfo;
  *
  * @package Epfremme\Everything\FileSystem
  */
-class Cache
+class Cache implements \Countable
 {
     const CACHE_DIR = '.cache';
 
@@ -32,7 +31,9 @@ class Cache
     public function __construct()
     {
         $this->fs = new Filesystem();
+        $this->finder = new Finder();
 
+        $this->finder->directories()->in(self::CACHE_DIR)->depth(0);
         $this->initCacheDir();
     }
 
@@ -87,20 +88,17 @@ class Cache
 
     public function each(\Closure $fn)
     {
-        $finder = new Finder();
-        $finder->directories()->in(self::CACHE_DIR)->depth(0);
-
-        foreach ($finder as $key => $directory) {
-            /** @var \SplFileInfo $directory */
-//            if ($directory->isDir()) {
-//                continue;
-//            }
-
+        foreach ($this->finder as $key => $directory) {
             if ($fn($directory, $key) === false) {
                 return false;
             };
         }
 
         return true;
+    }
+
+    public function count()
+    {
+        return $this->finder->count();
     }
 }

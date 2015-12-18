@@ -6,30 +6,29 @@
  * Time: 12:42 AM
  */
 
-namespace Epfremme\Everything\Handler\Package;
-
+namespace Epfremme\Everything\Counter;
 
 use Epfremme\Collection\Collection;
 use Epfremme\Everything\Entity\Package;
 
-class CountPackageVersions
+class PackageVersionCounter implements \Countable
 {
     /**
-     * @var Collection|null
+     * @var Collection
      */
     private $packages;
 
     /**
      * CountPackageVersions constructor
      *
-     * @param Collection|null $packages
+     * @param Collection $packages
      */
     public function __construct(Collection $packages)
     {
         $this->packages = $packages;
     }
 
-    public function __invoke()
+    public function count()
     {
         return $this->packages->reduce(function($count, Package $package) {
             return $count + count($package->getVersions());
