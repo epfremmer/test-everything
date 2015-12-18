@@ -9,10 +9,7 @@
 namespace Epfremme\Everything\Tests\Composer;
 
 
-class Test extends \PHPUnit_Framework_TestCase
+class JsonTest extends \PHPUnit_Framework_TestCase
 {
-    public function testOne()
-    {
-        $this->assertTrue(true);
-    }
+    public function testOne() { }
 }
