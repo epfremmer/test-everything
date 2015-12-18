@@ -26,7 +26,7 @@ class ProcessFactoryTest extends \PHPUnit_Framework_TestCase
         $factory = new ProcessFactory('pwd');
 
         /** @var SplFileInfo $fileinfo */
-        $fileinfo = $this->getMock(SplFileInfo::class);
+        $fileinfo = $this->getMockBuilder(SplFileInfo::class)->disableOriginalConstructor()->getMock();
         $process = $factory->make($fileinfo);
 
         $this->assertInstanceOf(Process::class, $process);
