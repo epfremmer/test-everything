@@ -32,8 +32,8 @@ class Package
     private $description;
 
     /**
-     * @JMS\Type("string")
-     * @var string
+     * @JMS\Type("DateTime")
+     * @var \DateTime
      */
     private $time;
 
@@ -90,7 +90,7 @@ class Package
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getTime()
     {
@@ -152,6 +152,7 @@ class Package
     public function setVersions($versions)
     {
         $this->versions = $versions;
+
         return $this;
     }
 }
