@@ -35,10 +35,15 @@ class CompleteProgressBar
         $this->progressBar = $progressBar;
     }
 
+    /**
+     * Complete progress bar
+     *
+     * @return mixed
+     */
     public function __invoke()
     {
         $this->progressBar->finish();
-        $this->output->writeln(sprintf('<info> [complete]</info>'));
+        $this->output->writeln('<info> [complete]</info>');
 
         return func_get_arg(0);
     }

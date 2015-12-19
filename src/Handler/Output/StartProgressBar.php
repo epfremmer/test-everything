@@ -34,10 +34,18 @@ class StartProgressBar
         $this->countable = $countable;
     }
 
+    /**
+     * Start/Restart progress bar with max if countable
+     * provided during construct
+     *
+     * @return mixed
+     */
     public function __invoke()
     {
         $max = $this->countable ? $this->countable->count() : null;
 
         $this->progressBar->start($max);
+
+        return func_get_arg(0);
     }
 }

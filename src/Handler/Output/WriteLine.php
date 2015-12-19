@@ -8,7 +8,6 @@
 
 namespace Epfremme\Everything\Handler\Output;
 
-
 use Symfony\Component\Console\Output\OutputInterface;
 
 class WriteLine
@@ -17,6 +16,7 @@ class WriteLine
      * @var OutputInterface
      */
     private $output;
+
     /**
      * @var string
      */
