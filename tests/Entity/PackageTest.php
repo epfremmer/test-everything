@@ -6,7 +6,6 @@
  */
 namespace Epfremme\Everything\Tests\Entity;
 
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use Epfremme\Everything\Entity\Package;
 use Epfremme\Everything\Subscriber\SerializationSubscriber;
 use JMS\Serializer\EventDispatcher\EventDispatcher;
@@ -38,8 +37,6 @@ class PackageTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-
-        AnnotationRegistry::registerLoader('class_exists');
 
         $serializerBuilder = new SerializerBuilder();
         $serializerBuilder->configureListeners(function(EventDispatcher $eventDispatcher) {
@@ -146,8 +143,9 @@ class PackageTest extends \PHPUnit_Framework_TestCase
 
     public function testSetVersions()
     {
-        $this->package->setVersions([]);
+        $package = $this->package->setVersions([]);
 
+        $this->assertInstanceOf(Package::class, $package);
         $this->assertEquals([], $this->package->getVersions());
     }
 }

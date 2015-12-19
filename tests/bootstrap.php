@@ -19,4 +19,6 @@ call_user_func(function() {
     }
 
     require_once $autoloadFile;
+
+    \Doctrine\Common\Annotations\AnnotationRegistry::registerLoader('class_exists');
 });
