@@ -62,7 +62,7 @@ class Json
     }
 
     /**
-     * Return require dev array
+     * Return require-dev array
      *
      * @return array
      */
@@ -72,16 +72,21 @@ class Json
     }
 
     /**
-     * Return current data as JSON
+     * Set require-dev array
      *
-     * @return string
+     * @param array $packages
+     * @return $this
      */
-    public function toJson()
+    public function setRequireDev(array $packages)
     {
-        return json_encode($this->data, JSON_PRETTY_PRINT);
+        $this->data[self::REQUIRE_DEV_KEY] = $packages;
+
+        return $this;
     }
 
     /**
+     * Return value or null at target key
+     *
      * @param string $key
      * @return mixed
      */
@@ -92,6 +97,16 @@ class Json
         }
 
         return $this->data[$key];
+    }
+
+    /**
+     * Return current data as JSON
+     *
+     * @return string
+     */
+    public function toJson()
+    {
+        return json_encode($this->data, JSON_PRETTY_PRINT);
     }
 
     /**
