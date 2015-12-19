@@ -8,7 +8,6 @@ namespace Epfremme\Everything\Tests\Filesystem;
 
 use Epfremme\Everything\Filesystem\Cache;
 use Epfremme\Everything\Composer\Json;
-use Mockery;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -21,12 +20,12 @@ use Symfony\Component\Finder\SplFileInfo;
 class CacheTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Filesystem|Mockery\MockInterface
+     * @var Filesystem|\Mockery\MockInterface
      */
     private $fs;
 
     /**
-     * @var Finder|Mockery\MockInterface
+     * @var Finder|\Mockery\MockInterface
      */
     private $finder;
 
@@ -37,8 +36,8 @@ class CacheTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->fs = Mockery::mock(Filesystem::class);
-        $this->finder = Mockery::mock(Finder::class);
+        $this->fs = \Mockery::mock(Filesystem::class);
+        $this->finder = \Mockery::mock(Finder::class);
     }
 
     /**
@@ -58,7 +57,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase
      */
     private function getIterator($count = 0)
     {
-        $directory = Mockery::mock(SplFileInfo::class);
+        $directory = \Mockery::mock(SplFileInfo::class);
         $iterator = new \ArrayObject();
 
         for($i =0; $i < $count; $i++) {
@@ -182,7 +181,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase
         $targetDir = join('/', ['/tmp', sha1('')]);
         $options = ['override' => true, 'delete' => true];
 
-        /** @var \SplFileInfo|Mockery\MockInterface $directory */
+        /** @var SplFileInfo|\Mockery\MockInterface $directory */
         $directory = $iterator->getIterator()->current();
 
         $directory->shouldReceive('getRealPath')->times(10)->withNoArgs()->andReturn($targetDir);
@@ -214,7 +213,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase
         $targetDir = join('/', ['/tmp', sha1('')]);
         $options = ['override' => true, 'delete' => true];
 
-        /** @var \SplFileInfo|Mockery\MockInterface $directory */
+        /** @var SplFileInfo|\Mockery\MockInterface $directory */
         $directory = $iterator->getIterator()->current();
 
         $directory->shouldReceive('getRealPath')->times(10)->withNoArgs()->andReturn($targetDir);
