@@ -41,12 +41,31 @@ class CacheTest extends \PHPUnit_Framework_TestCase
         $this->finder = Mockery::mock(Finder::class);
     }
 
+    /**
+     * @return Cache
+     */
     private function getCache()
     {
         $this->fs->shouldReceive('exists')->once()->andReturn(true);
         $this->finder->shouldReceive('directories', 'in', 'depth')->once()->andReturnSelf();
 
         return new Cache($this->fs, $this->finder);
+    }
+
+    /**
+     * @param int $count
+     * @return \ArrayObject
+     */
+    private function getIterator($count = 0)
+    {
+        $directory = Mockery::mock(SplFileInfo::class);
+        $iterator = new \ArrayObject();
+
+        for($i =0; $i < $count; $i++) {
+            $iterator->append($directory);
+        }
+
+        return $iterator;
     }
 
     public function testConstruct()
@@ -117,21 +136,14 @@ class CacheTest extends \PHPUnit_Framework_TestCase
 
     public function testEach()
     {
-        $directory = Mockery::mock(SplFileInfo::class);
-        $iterator = Mockery::mock(\Iterator::class);
+        $this->finder->shouldReceive('getIterator')->andReturn($this->getIterator(5));
 
-        $this->finder->shouldReceive('getIterator')->once()->withNoArgs()->andReturn($iterator);
-
-        $iterator->shouldReceive('rewind')->once()->withNoArgs();
-        $iterator->shouldReceive('next')->atMost(5)->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('current')->atMost(5)->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('key')->atMost(5)->withNoArgs()->andReturn('key');
-        $iterator->shouldReceive('valid')->times(5)->withNoArgs()->andReturn(true);
-        $iterator->shouldReceive('valid')->once()->withNoArgs()->andReturn(false);
-
-        $result = $this->getCache()->each(function($directory, $key) {
+        $index = 0;
+        $result = $this->getCache()->each(function($directory, $key) use (&$index) {
             $this->assertInstanceOf(SplFileInfo::class, $directory);
-            $this->assertEquals('key', $key);
+            $this->assertEquals($index, $key);
+
+            $index++;
         });
 
         $this->assertTrue($result);
@@ -139,16 +151,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase
 
     public function testEachReturnEarly()
     {
-        $directory = Mockery::mock(SplFileInfo::class);
-        $iterator = Mockery::mock(\Iterator::class);
-
-        $this->finder->shouldReceive('getIterator')->once()->withNoArgs()->andReturn($iterator);
-
-        $iterator->shouldReceive('rewind')->once()->withNoArgs();
-        $iterator->shouldReceive('next')->once()->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('current')->once()->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('key')->once()->withNoArgs()->andReturn('key');
-        $iterator->shouldReceive('valid')->once()->withNoArgs()->andReturn(true);
+        $this->finder->shouldReceive('getIterator')->once()->withNoArgs()->andReturn($this->getIterator(5));
 
         $result = $this->getCache()->each(function() {
             return false;
@@ -159,47 +162,84 @@ class CacheTest extends \PHPUnit_Framework_TestCase
 
     public function testCount()
     {
-        $directory = Mockery::mock(SplFileInfo::class);
-        $iterator = Mockery::mock(\Iterator::class);
-
         $cache = $this->getCache();
 
-        $this->assertInstanceOf(\Countable::class,$cache);
+        $this->assertInstanceOf(\Countable::class, $cache);
 
         $this->finder->shouldReceive('count')->passthru();
-        $this->finder->shouldReceive('getIterator')->andReturn($iterator);
-
-        $iterator->shouldReceive('rewind')->once()->withNoArgs();
-        $iterator->shouldReceive('next')->atMost(5)->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('current')->atMost(5)->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('key')->atMost(5)->withNoArgs()->andReturn('key');
-        $iterator->shouldReceive('valid')->times(5)->withNoArgs()->andReturn(true);
-        $iterator->shouldReceive('valid')->once()->withNoArgs()->andReturn(false);
+        $this->finder->shouldReceive('getIterator')->andReturn($this->getIterator(5));
 
         $this->assertEquals(5, $cache->count());
-
-        $iterator->shouldReceive('rewind')->once()->withNoArgs();
-        $iterator->shouldReceive('next')->atMost(5)->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('current')->atMost(5)->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('key')->atMost(5)->withNoArgs()->andReturn('key');
-        $iterator->shouldReceive('valid')->times(5)->withNoArgs()->andReturn(true);
-        $iterator->shouldReceive('valid')->once()->withNoArgs()->andReturn(false);
-
         $this->assertCount(5, $cache);
     }
 
-//    public function testMirror()
-//    {
-//        $this->assertTrue(true);
-//        $cache = $this->getCache();
-//        var_dump(__DIR__);exit;
-//
-//
-//
-//        $this->fs->shouldReceive('makePathRelative')->times(5)->with('/src', __DIR__)->andReturn('');
-//        $this->fs->shouldReceive('makePathRelative')->times(5)->with('/tests', __DIR__)->andReturn('');
-////        $this->fs->shouldReceive('mirror')->times(10)->with()
-//
-//        $cache->mirror(['/src', '/tests']);
-//    }
+    public function testMirror()
+    {
+        $cache = $this->getCache();
+        $iterator = $this->getIterator(5);
+
+        $originDir = getcwd();
+        $targetDir = join('/', ['/tmp', sha1('')]);
+        $options = ['override' => true, 'delete' => true];
+
+        /** @var \SplFileInfo|Mockery\MockInterface $directory */
+        $directory = $iterator->getIterator()->current();
+
+        $directory->shouldReceive('getRealPath')->times(10)->withNoArgs()->andReturn($targetDir);
+        $this->finder->shouldReceive('getIterator')->andReturn($iterator);
+
+        $this->fs->shouldReceive('mirror')->times(5)->with(
+            join('/',[$originDir, 'src/']),
+            join('/', [$targetDir, 'src/']),
+            null,
+            $options
+        );
+
+        $this->fs->shouldReceive('mirror')->times(5)->with(
+            join('/',[$originDir, 'tests/']),
+            join('/', [$targetDir, 'tests/']),
+            null,
+            $options
+        );
+
+        $cache->mirror(['src/', 'tests/']);
+    }
+
+    public function testMirrorWithCallback()
+    {
+        $cache = $this->getCache();
+        $iterator = $this->getIterator(5);
+
+        $originDir = getcwd();
+        $targetDir = join('/', ['/tmp', sha1('')]);
+        $options = ['override' => true, 'delete' => true];
+
+        /** @var \SplFileInfo|Mockery\MockInterface $directory */
+        $directory = $iterator->getIterator()->current();
+
+        $directory->shouldReceive('getRealPath')->times(10)->withNoArgs()->andReturn($targetDir);
+        $this->finder->shouldReceive('getIterator')->andReturn($iterator);
+
+        $this->fs->shouldReceive('mirror')->times(5)->with(
+            join('/',[$originDir, 'src/']),
+            join('/', [$targetDir, 'src/']),
+            null,
+            $options
+        );
+
+        $this->fs->shouldReceive('mirror')->times(5)->with(
+            join('/',[$originDir, 'tests/']),
+            join('/', [$targetDir, 'tests/']),
+            null,
+            $options
+        );
+
+        $callCount = 0;
+
+        $cache->mirror(['src/', 'tests/'], function() use (&$callCount) {
+            $callCount++;
+        });
+
+        $this->assertEquals(5, $callCount);
+    }
 }
