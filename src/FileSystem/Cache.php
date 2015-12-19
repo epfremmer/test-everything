@@ -26,6 +26,11 @@ class Cache implements \Countable
     private $fs;
 
     /**
+     * @var Finder
+     */
+    private $finder;
+
+    /**
      * Cache constructor
      */
     public function __construct()
@@ -33,7 +38,6 @@ class Cache implements \Countable
         $this->fs = new Filesystem();
         $this->finder = new Finder();
 
-        $this->finder->directories()->in(self::CACHE_DIR)->depth(0);
         $this->initCacheDir();
     }
 
@@ -47,8 +51,22 @@ class Cache implements \Countable
         if (!$this->fs->exists(self::CACHE_DIR)) {
             $this->fs->mkdir(self::CACHE_DIR);
         }
+
+        $this->finder->directories()->in(self::CACHE_DIR)->depth(0);
     }
 
+    /**
+     * Create test configuration cache directory and return
+     * the directory hash name
+     *
+     * @note
+     *
+     * Cache test directory names are sha1 hash representation
+     * of the composer json test configuration
+     *
+     * @param Json $config
+     * @return string
+     */
     public function addConfig(Json $config)
     {
         $json = $config->toJson();
@@ -68,6 +86,15 @@ class Cache implements \Countable
         return $hash;
     }
 
+    /**
+     * Mirror target project path to all cached test directories
+     *
+     * Overrides existing cached project files and deletes any cached
+     * files that are no longer present in the test directory
+     *
+     * @param array $paths
+     * @param \Closure|null $callback
+     */
     public function mirror(array $paths, \Closure $callback = null)
     {
         $this->each(function(SplFileInfo $directory) use ($paths, $callback) {
@@ -86,6 +113,12 @@ class Cache implements \Countable
         });
     }
 
+    /**
+     * Iterate over all cached test directories
+     *
+     * @param \Closure $fn
+     * @return bool
+     */
     public function each(\Closure $fn)
     {
         foreach ($this->finder as $key => $directory) {
@@ -97,6 +130,11 @@ class Cache implements \Countable
         return true;
     }
 
+    /**
+     * Count all cached test directories
+     *
+     * @return int
+     */
     public function count()
     {
         return $this->finder->count();
