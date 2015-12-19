@@ -32,11 +32,14 @@ class Cache implements \Countable
 
     /**
      * Cache constructor
+     *
+     * @param Filesystem $filesystem
+     * @param Finder $finder
      */
-    public function __construct()
+    public function __construct(Filesystem $filesystem, Finder $finder)
     {
-        $this->fs = new Filesystem();
-        $this->finder = new Finder();
+        $this->fs = $filesystem;
+        $this->finder = $finder;
 
         $this->initCacheDir();
     }
@@ -46,7 +49,7 @@ class Cache implements \Countable
      *
      * @return void
      */
-    public function initCacheDir()
+    private function initCacheDir()
     {
         if (!$this->fs->exists(self::CACHE_DIR)) {
             $this->fs->mkdir(self::CACHE_DIR);
@@ -69,8 +72,7 @@ class Cache implements \Countable
      */
     public function addConfig(Json $config)
     {
-        $json = $config->toJson();
-        $hash = sha1($json);
+        $hash = sha1($config);
         $file = sprintf('%s/%s/composer.json', self::CACHE_DIR, $hash);
         $lock = sprintf('%s/%s/composer.lock', self::CACHE_DIR, $hash);
 
@@ -80,7 +82,7 @@ class Cache implements \Countable
 
         if (!$this->fs->exists($file)) {
             $this->fs->mkdir(sprintf('%s/%s', self::CACHE_DIR, $hash));
-            $this->fs->dumpFile($file, $json);
+            $this->fs->dumpFile($file, $config);
         }
 
         return $hash;
@@ -109,7 +111,9 @@ class Cache implements \Countable
                 ]);
             }
 
-            $callback();
+            if ($callback instanceof \Closure) {
+                $callback();
+            }
         });
     }
 

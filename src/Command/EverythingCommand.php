@@ -28,6 +28,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 class EverythingCommand extends Command
@@ -128,7 +130,7 @@ class EverythingCommand extends Command
         $this->packages = new Collection();
         $this->promises = new Collection();
         $this->results = new Collection();
-        $this->cache = new Cache();
+        $this->cache = new Cache(new Filesystem(), new Finder());
         $this->json = new Json(file_get_contents('composer.json'));
         $this->phpunitXml = simplexml_load_file('phpunit.xml.dist');
 
@@ -169,7 +171,7 @@ class EverythingCommand extends Command
         $this->progress->start(count($this->json->getRequire()));
 
         foreach ($this->json->getRequire() as $package => $constraint) {
-            if (strtolower($package) === 'php') {
+            if (strtolower($package) === 'php' || strpos(strtolower($package), 'ext-') === 0) {
                 $this->progress->advance();
                 continue;
             }
@@ -205,8 +207,8 @@ class EverythingCommand extends Command
 
     private function runTests()
     {
-        $processFactory = new ProcessFactory('ls');
-//        $processFactory = new ProcessFactory('nice composer install -q > /dev/null 2>&1 && bin/phpunit');
+//        $processFactory = new ProcessFactory('ls');
+        $processFactory = new ProcessFactory('nice composer install -q > /dev/null 2>&1 && bin/phpunit');
 //        $processFactory = new ProcessFactory('nice bin/phpunit');
         $processManager = new ProcessManager($processFactory);
         $resultsParser = new PHPUnitResultsParser();
