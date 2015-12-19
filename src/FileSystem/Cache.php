@@ -101,11 +101,10 @@ class Cache implements \Countable
     {
         $this->each(function(SplFileInfo $directory) use ($paths, $callback) {
             foreach ($paths as $path) {
-                $relativePath = $this->fs->makePathRelative($path, (string) $directory);
-                $originPath = realpath(sprintf('%s/%s', $directory->getRealPath(), $relativePath));
-                $targetPath = sprintf('%s/%s', $directory->getRealPath(), $path);
+                $originDir = join('/', [getcwd(), $path]);
+                $targetDir = join('/', [$directory->getRealPath(), $path]);
 
-                $this->fs->mirror($originPath, $targetPath, null, [
+                $this->fs->mirror($originDir, $targetDir, null, [
                     'override' => true,
                     'delete' => true,
                 ]);
