@@ -123,9 +123,9 @@ class CacheTest extends \PHPUnit_Framework_TestCase
         $this->finder->shouldReceive('getIterator')->once()->withNoArgs()->andReturn($iterator);
 
         $iterator->shouldReceive('rewind')->once()->withNoArgs();
-        $iterator->shouldReceive('next')->times(5)->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('current')->times(5)->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('key')->times(5)->withNoArgs()->andReturn('key');
+        $iterator->shouldReceive('next')->atMost(5)->withNoArgs()->andReturn($directory);
+        $iterator->shouldReceive('current')->atMost(5)->withNoArgs()->andReturn($directory);
+        $iterator->shouldReceive('key')->atMost(5)->withNoArgs()->andReturn('key');
         $iterator->shouldReceive('valid')->times(5)->withNoArgs()->andReturn(true);
         $iterator->shouldReceive('valid')->once()->withNoArgs()->andReturn(false);
 
@@ -170,18 +170,18 @@ class CacheTest extends \PHPUnit_Framework_TestCase
         $this->finder->shouldReceive('getIterator')->andReturn($iterator);
 
         $iterator->shouldReceive('rewind')->once()->withNoArgs();
-        $iterator->shouldReceive('next')->times(5)->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('current')->times(5)->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('key')->times(5)->withNoArgs()->andReturn('key');
+        $iterator->shouldReceive('next')->atMost(5)->withNoArgs()->andReturn($directory);
+        $iterator->shouldReceive('current')->atMost(5)->withNoArgs()->andReturn($directory);
+        $iterator->shouldReceive('key')->atMost(5)->withNoArgs()->andReturn('key');
         $iterator->shouldReceive('valid')->times(5)->withNoArgs()->andReturn(true);
         $iterator->shouldReceive('valid')->once()->withNoArgs()->andReturn(false);
 
         $this->assertEquals(5, $cache->count());
 
         $iterator->shouldReceive('rewind')->once()->withNoArgs();
-        $iterator->shouldReceive('next')->times(5)->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('current')->times(5)->withNoArgs()->andReturn($directory);
-        $iterator->shouldReceive('key')->times(5)->withNoArgs()->andReturn('key');
+        $iterator->shouldReceive('next')->atMost(5)->withNoArgs()->andReturn($directory);
+        $iterator->shouldReceive('current')->atMost(5)->withNoArgs()->andReturn($directory);
+        $iterator->shouldReceive('key')->atMost(5)->withNoArgs()->andReturn('key');
         $iterator->shouldReceive('valid')->times(5)->withNoArgs()->andReturn(true);
         $iterator->shouldReceive('valid')->once()->withNoArgs()->andReturn(false);
 

@@ -9,6 +9,7 @@
 namespace Epfremme\Everything\Tests\Process;
 
 use Epfremme\Everything\Process\ProcessFactory;
+use Mockery;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Process;
 
@@ -26,7 +27,7 @@ class ProcessFactoryTest extends \PHPUnit_Framework_TestCase
         $factory = new ProcessFactory('pwd');
 
         /** @var SplFileInfo $fileinfo */
-        $fileinfo = $this->getMockBuilder(SplFileInfo::class)->disableOriginalConstructor()->getMock();
+        $fileinfo = Mockery::mock(SplFileInfo::class);
         $process = $factory->make($fileinfo);
 
         $this->assertInstanceOf(Process::class, $process);

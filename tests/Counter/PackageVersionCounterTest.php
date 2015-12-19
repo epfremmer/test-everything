@@ -22,6 +22,7 @@ class PackageVersionCounterTest extends \PHPUnit_Framework_TestCase
         $packages = $this->getPackages();
         $packageCounter = new PackageVersionCounter($packages);
 
+        $this->assertInstanceOf(\Countable::class, $packageCounter);
         $this->assertAttributeSame($packages, 'packages', $packageCounter);
     }
 
