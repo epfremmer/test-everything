@@ -1,15 +1,25 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: epfremme
- * Date: 12/18/15
- * Time: 1:50 AM
+ * File WriteTestConfigurationsTest.php
+ *
+ * @author Edward Pfremmer <epfremme@nerdery.com>
  */
-
 namespace Epfremme\Everything\Tests\Handler\Setup;
 
-
+/**
+ * Class WriteTestConfigurationsTest
+ *
+ * @package Epfremme\Everything\Tests\Handler\Setup
+ */
 class WriteTestConfigurationsTest extends \PHPUnit_Framework_TestCase
 {
+    public function testConstruct()
+    {
 
+    }
+
+    public function testInvoke()
+    {
+
+    }
 }

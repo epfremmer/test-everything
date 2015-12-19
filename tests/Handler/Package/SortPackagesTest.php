@@ -1,15 +1,25 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: epfremme
- * Date: 12/18/15
- * Time: 1:48 AM
+ * File SortPackagesTest.php
+ *
+ * @author Edward Pfremmer <epfremme@nerdery.com>
  */
-
 namespace Epfremme\Everything\Tests\Handler\Package;
 
-
+/**
+ * Class SortPackagesTest
+ *
+ * @package Epfremme\Everything\Tests\Handler\Package
+ */
 class SortPackagesTest extends \PHPUnit_Framework_TestCase
 {
+    public function testConstruct()
+    {
 
+    }
+
+    public function testInvoke()
+    {
+
+    }
 }

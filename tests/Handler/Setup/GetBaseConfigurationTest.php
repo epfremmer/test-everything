@@ -1,15 +1,25 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: epfremme
- * Date: 12/18/15
- * Time: 1:49 AM
+ * File GetBaseConfigurationTest.php
+ *
+ * @author Edward Pfremmer <epfremme@nerdery.com>
  */
-
 namespace Epfremme\Everything\Tests\Handler\Setup;
 
-
+/**
+ * Class GetBaseConfigurationTest
+ *
+ * @package Epfremme\Everything\Tests\Handler\Setup
+ */
 class GetBaseConfigurationTest extends \PHPUnit_Framework_TestCase
 {
+    public function testConstruct()
+    {
 
+    }
+
+    public function testInvoke()
+    {
+
+    }
 }

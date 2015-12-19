@@ -1,15 +1,25 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: epfremme
- * Date: 12/18/15
- * Time: 1:48 AM
+ * File StorePackageTest.php
+ *
+ * @author Edward Pfremmer <epfremme@nerdery.com>
  */
-
 namespace Epfremme\Everything\Tests\Handler\Package;
 
-
+/**
+ * Class StorePackageTest
+ *
+ * @package Epfremme\Everything\Tests\Handler\Package
+ */
 class StorePackageTest extends \PHPUnit_Framework_TestCase
 {
+    public function testConstruct()
+    {
 
+    }
+
+    public function testInvoke()
+    {
+
+    }
 }
