@@ -8,7 +8,6 @@
 
 namespace Epfremme\Everything\Handler\Error;
 
-
 use Epfremme\Collection\Collection;
 use Epfremme\Everything\Entity\TestResult;
 use Symfony\Component\Process\Process;
@@ -30,10 +29,18 @@ class HandleProcessError
         $this->results = $results;
     }
 
+    /**
+     * Handle parsing failed process error output
+     *
+     * @param Process $process
+     * @return Process
+     */
     public function __invoke(Process $process)
     {
         $result = new TestResult($process->getWorkingDirectory()->getFilename(), 'ERROR');
 
         $this->results->set($result->getHash(), $result);
+
+        return $result;
     }
 }
