@@ -14,6 +14,11 @@ use Tebru\Retrofit\Annotation as Rest;
 class PackagistService
 {
     /**
+     * @var Client
+     */
+    private $client;
+
+    /**
      * PackagistService constructor
      */
     public function __construct()
