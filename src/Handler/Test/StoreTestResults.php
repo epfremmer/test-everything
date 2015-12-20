@@ -32,5 +32,7 @@ class StoreTestResults
     public function __invoke(TestResult $result)
     {
         $this->results->set($result->getHash(), $result);
+
+        return $result;
     }
 }
