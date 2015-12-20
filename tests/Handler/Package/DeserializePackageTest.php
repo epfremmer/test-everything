@@ -8,11 +8,8 @@ namespace Epfremme\Everything\Tests\Handler\Package;
 
 use Epfremme\Everything\Entity\Package;
 use Epfremme\Everything\Handler\Package\DeserializePackage;
-use Epfremme\Everything\Subscriber\SerializationSubscriber;
 use Epfremme\Everything\Tests\Entity\PackageTest;
-use JMS\Serializer\EventDispatcher\EventDispatcher;
-use JMS\Serializer\Serializer;
-use JMS\Serializer\SerializerBuilder;
+use Epfremme\Everything\Tests\Traits\SerializerTrait;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -22,10 +19,7 @@ use Psr\Http\Message\ResponseInterface;
  */
 class DeserializePackageTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Serializer
-     */
-    private $serializer;
+    use SerializerTrait;
 
     /**
      * {@inheritdoc}
@@ -34,12 +28,7 @@ class DeserializePackageTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $serializerBuilder = new SerializerBuilder();
-        $serializerBuilder->configureListeners(function(EventDispatcher $eventDispatcher) {
-            $eventDispatcher->addSubscriber(new SerializationSubscriber());
-        });
-
-        $this->serializer = $serializerBuilder->build();
+        $this->serializer = $this->getSerializer();
     }
 
     public function testConstruct()

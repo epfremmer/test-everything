@@ -8,11 +8,8 @@ namespace Epfremme\Everything\Tests\Handler\Package;
 
 use Epfremme\Everything\Entity\Package;
 use Epfremme\Everything\Handler\Package\FilterPackageVersions;
-use Epfremme\Everything\Subscriber\SerializationSubscriber;
 use Epfremme\Everything\Tests\Entity\PackageTest;
-use JMS\Serializer\EventDispatcher\EventDispatcher;
-use JMS\Serializer\Serializer;
-use JMS\Serializer\SerializerBuilder;
+use Epfremme\Everything\Tests\Traits\SerializerTrait;
 
 /**
  * Class FilterPackageVersionsTest
@@ -21,25 +18,7 @@ use JMS\Serializer\SerializerBuilder;
  */
 class FilterPackageVersionsTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Serializer
-     */
-    private $serializer;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
-    {
-        parent::setUp();
-
-        $serializerBuilder = new SerializerBuilder();
-        $serializerBuilder->configureListeners(function(EventDispatcher $eventDispatcher) {
-            $eventDispatcher->addSubscriber(new SerializationSubscriber());
-        });
-
-        $this->serializer = $serializerBuilder->build();
-    }
+    use SerializerTrait;
 
     public function testConstruct()
     {
@@ -51,7 +30,7 @@ class FilterPackageVersionsTest extends \PHPUnit_Framework_TestCase
     public function testInvoke()
     {
         $handler = new FilterPackageVersions('^1.0');
-        $package = $this->serializer->deserialize(PackageTest::TEST_PACKAGE_JSON, Package::class, 'json');
+        $package = $this->getSerializer()->deserialize(PackageTest::TEST_PACKAGE_JSON, Package::class, 'json');
         $expected = [
             '1.0.0' => ['name' => 'test/test', 'version' => '1.0.0']
         ];

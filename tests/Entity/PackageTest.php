@@ -7,10 +7,7 @@
 namespace Epfremme\Everything\Tests\Entity;
 
 use Epfremme\Everything\Entity\Package;
-use Epfremme\Everything\Subscriber\SerializationSubscriber;
-use JMS\Serializer\EventDispatcher\EventDispatcher;
-use JMS\Serializer\Serializer;
-use JMS\Serializer\SerializerBuilder;
+use Epfremme\Everything\Tests\Traits\SerializerTrait;
 
 /**
  * Class PackageTest
@@ -19,6 +16,8 @@ use JMS\Serializer\SerializerBuilder;
  */
 class PackageTest extends \PHPUnit_Framework_TestCase
 {
+    use SerializerTrait;
+
     const TEST_PACKAGE_JSON = '{"package":{"name":"test/test","description":"test description","time":"2015-12-07T00:13:33+0000","maintainers":[{"name": "epfremmer"}],"versions":{"dev-master":{"name":"test/test","version":"dev-master"}, "1.0.0-beta":{"name":"test/test","version":"1.0.0-beta"}, "1.0.0":{"name":"test/test","version":"1.0.0"}},"type":"library","repository":"https://github.com/test/test.git","downloads":{"total":1,"monthly":1,"daily":0},"favers":1}}';
 
     /**
@@ -27,23 +26,11 @@ class PackageTest extends \PHPUnit_Framework_TestCase
     private $package;
 
     /**
-     * @var Serializer
-     */
-    private $serializer;
-
-    /**
      * {@inheritdoc}
      */
     public function setUp()
     {
         parent::setUp();
-
-        $serializerBuilder = new SerializerBuilder();
-        $serializerBuilder->configureListeners(function(EventDispatcher $eventDispatcher) {
-            $eventDispatcher->addSubscriber(new SerializationSubscriber());
-        });
-
-        $this->serializer = $serializerBuilder->build();
 
         $reflectionClass = new \ReflectionClass(Package::class);
 
@@ -86,14 +73,14 @@ class PackageTest extends \PHPUnit_Framework_TestCase
 
     public function testSerialization()
     {
-        $packageJson = $this->serializer->serialize(['package' => $this->package], 'json');
+        $packageJson = $this->getSerializer()->serialize(['package' => $this->package], 'json');
 
         $this->assertJsonStringEqualsJsonString(self::TEST_PACKAGE_JSON, $packageJson);
     }
 
     public function testDeserialization()
     {
-        $package = $this->serializer->deserialize(self::TEST_PACKAGE_JSON, Package::class, 'json');
+        $package = $this->getSerializer()->deserialize(self::TEST_PACKAGE_JSON, Package::class, 'json');
 
         $this->assertInstanceOf(Package::class, $package);
         $this->assertEquals($this->package, $package);
