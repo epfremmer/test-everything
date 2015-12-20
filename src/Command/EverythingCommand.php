@@ -199,7 +199,6 @@ class EverythingCommand extends Command
             ->then(new Handler\Setup\WriteTestConfigurations($this->packages, $this->cache, $this->json))
             ->then(new Handler\Setup\WritePhpUnitTestXml($this->cache, $this->phpunitXml))
             ->then(new Handler\Setup\CopyProjectFiles($this->cache, $this->json, $this->progress))
-            ->then(new Handler\Output\CompleteProgressBar($this->output, $this->progress))
             ->wait();
 
         $this->promises->push($promise);
@@ -214,6 +213,7 @@ class EverythingCommand extends Command
         $resultsParser = new PHPUnitResultsParser();
 
         $this->resolvePromises()
+            ->then(new Handler\Output\CompleteProgressBar($this->output, $this->progress))
             ->then(new Handler\Output\WriteLine($this->output, 'Running distribution tests...'))
             ->then(new Handler\Output\StartProgressBar($this->progress, $this->cache))
             ->wait();
