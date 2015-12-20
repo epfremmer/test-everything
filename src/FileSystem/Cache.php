@@ -110,9 +110,7 @@ class Cache implements \Countable
                 ]);
             }
 
-            if ($callback instanceof \Closure) {
-                $callback();
-            }
+            $callback && $callback();
         });
     }
 

@@ -19,35 +19,11 @@ class ProcessorCounter
     private $cpuCount;
 
     /**
-     * ProcessCounter constructor
-     */
-    public function __construct()
-    {
-        $this->cpuCount = $this->getCpuCount();
-    }
-
-    /**
      * @return string
      */
     public function __toString()
     {
         return (string) $this->getCpuCount();
-    }
-
-    /**
-     * @return bool
-     */
-    private function hasProcInfo()
-    {
-        return is_file('/proc/cpuinfo');
-    }
-
-    /**
-     * @return bool
-     */
-    private function isWindows()
-    {
-        return 'WIN' == strtoupper(substr(PHP_OS, 0, 3));
     }
 
     /**
@@ -68,6 +44,22 @@ class ProcessorCounter
         }
 
         return $this->getSysctlCount();
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasProcInfo()
+    {
+        return is_file('/proc/cpuinfo');
+    }
+
+    /**
+     * @return bool
+     */
+    private function isWindows()
+    {
+        return 'WIN' == strtoupper(substr(PHP_OS, 0, 3));
     }
 
     /**
