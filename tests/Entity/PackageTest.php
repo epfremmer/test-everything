@@ -19,7 +19,7 @@ use JMS\Serializer\SerializerBuilder;
  */
 class PackageTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_PACKAGE_JSON = '{"package":{"name":"test/test","description":"test description","time":"2015-12-07T00:13:33+0000","maintainers":[{"name": "epfremmer"}],"versions":{"dev-master":{"name":"test/test","version":"dev-master"}},"type":"library","repository":"https://github.com/test/test.git","downloads":{"total":1,"monthly":1,"daily":0},"favers":1}}';
+    const TEST_PACKAGE_JSON = '{"package":{"name":"test/test","description":"test description","time":"2015-12-07T00:13:33+0000","maintainers":[{"name": "epfremmer"}],"versions":{"dev-master":{"name":"test/test","version":"dev-master"}, "1.0.0-beta":{"name":"test/test","version":"1.0.0-beta"}, "1.0.0":{"name":"test/test","version":"1.0.0"}},"type":"library","repository":"https://github.com/test/test.git","downloads":{"total":1,"monthly":1,"daily":0},"favers":1}}';
 
     /**
      * @var Package
@@ -73,7 +73,11 @@ class PackageTest extends \PHPUnit_Framework_TestCase
         $description->setValue($this->package, 'test description');
         $time->setValue($this->package, new \DateTime('2015-12-07T00:13:33+0000'));
         $maintainers->setValue($this->package, [['name' => 'epfremmer']]);
-        $versions->setValue($this->package, ['dev-master' => ['name' => 'test/test', 'version' => 'dev-master']]);
+        $versions->setValue($this->package, [
+            'dev-master' => ['name' => 'test/test', 'version' => 'dev-master'],
+            '1.0.0-beta' => ['name' => 'test/test', 'version' => '1.0.0-beta'],
+            '1.0.0' => ['name' => 'test/test', 'version' => '1.0.0']
+        ]);
         $type->setValue($this->package, 'library');
         $repository->setValue($this->package, 'https://github.com/test/test.git');
         $downloads->setValue($this->package, ['total' => 1, 'monthly' => 1, 'daily' => 0]);
@@ -118,7 +122,13 @@ class PackageTest extends \PHPUnit_Framework_TestCase
 
     public function testGetVersions()
     {
-        $this->assertEquals(['dev-master' => ['name' => 'test/test', 'version' => 'dev-master']], $this->package->getVersions());
+        $expected = [
+            'dev-master' => ['name' => 'test/test', 'version' => 'dev-master'],
+            '1.0.0-beta' => ['name' => 'test/test', 'version' => '1.0.0-beta'],
+            '1.0.0' => ['name' => 'test/test', 'version' => '1.0.0'],
+        ];
+
+        $this->assertEquals($expected, $this->package->getVersions());
     }
 
     public function testGetType()
