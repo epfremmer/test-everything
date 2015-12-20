@@ -52,7 +52,7 @@ class GetBaseConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $handler = new GetBaseConfiguration($this->packages);
 
-        $this->assertSame($this->packages, 'packages', $handler);
+        $this->assertAttributeSame($this->packages, 'packages', $handler);
     }
 
     public function testInvoke()
