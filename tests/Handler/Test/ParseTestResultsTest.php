@@ -9,6 +9,7 @@ namespace Epfremme\Everything\Tests\Handler\Test;
 use Epfremme\Everything\Entity\TestResult;
 use Epfremme\Everything\Handler\Test\ParseTestResults;
 use Epfremme\Everything\Parser\PHPUnitResultsParser;
+use Epfremme\Everything\Tests\Parser\PHPUnitResultsParserTest;
 use Symfony\Component\Process\Process;
 
 /**
@@ -18,9 +19,6 @@ use Symfony\Component\Process\Process;
  */
 class ParseTestResultsTest extends \PHPUnit_Framework_TestCase
 {
-    const PHPUNIT_SUCCESS_OUTPUT = "PHPUnit 4.8.21 by Sebastian Bergmann and contributors.\n\n....\n\nTime: 63 ms, Memory: 5.50Mb\n\nOK (4 tests, 4 assertions)";
-    const PHPUNIT_ERROR_OUTPUT = "PHPUnit 4.8.21 by Sebastian Bergmann and contributors.\n\n.E..\n\nTime: 69 ms, Memory: 5.50Mb\n\nThere was 1 error:\n\n1) Namespace\\Test::testStart\nException:\n\n/test/file.php:1\n\nFAILURES!\nTests: 4, Assertions: 3, Errors: 1.";
-
     /**
      * @var PHPUnitResultsParser
      */
@@ -48,7 +46,7 @@ class ParseTestResultsTest extends \PHPUnit_Framework_TestCase
         $handler = new ParseTestResults($this->parser);
         $process = \Mockery::mock(Process::class);
 
-        $process->shouldReceive('getOutput')->once()->withNoArgs()->andReturn(self::PHPUNIT_SUCCESS_OUTPUT);
+        $process->shouldReceive('getOutput')->once()->withNoArgs()->andReturn(PHPUnitResultsParserTest::PHPUNIT_SUCCESS_OUTPUT);
         $process->shouldReceive('getWorkingDirectory->getFilename')->once()->withNoArgs()->andReturn(sha1(''));
         $process->shouldIgnoreMissing();
 
@@ -65,7 +63,7 @@ class ParseTestResultsTest extends \PHPUnit_Framework_TestCase
         $handler = new ParseTestResults($this->parser);
         $process = \Mockery::mock(Process::class);
 
-        $process->shouldReceive('getOutput')->once()->withNoArgs()->andReturn(self::PHPUNIT_ERROR_OUTPUT);
+        $process->shouldReceive('getOutput')->once()->withNoArgs()->andReturn(PHPUnitResultsParserTest::PHPUNIT_ERROR_OUTPUT);
         $process->shouldReceive('getWorkingDirectory->getFilename')->once()->withNoArgs()->andReturn(sha1(''));
         $process->shouldIgnoreMissing();
 
@@ -74,6 +72,6 @@ class ParseTestResultsTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(TestResult::class, $result);
         $this->assertEquals($result->getHash(), sha1(''));
-        $this->assertEquals('Tests: 4, Assertions: 3, Errors: 1.', $result->getResult());
+        $this->assertEquals('FAILURES! Tests: 4, Assertions: 3, Errors: 1.', $result->getResult());
     }
 }
