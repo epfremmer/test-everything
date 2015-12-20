@@ -79,7 +79,7 @@ class ProcessQueueTest extends \PHPUnit_Framework_TestCase
     public function testGetRunning()
     {
         $queue = new ProcessQueue();
-        $process = new Process('pwd');
+        $process = new Process('sleep 0.1');
 
         $queue->add($process);
 
