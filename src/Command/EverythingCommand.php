@@ -34,6 +34,8 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class EverythingCommand extends Command
 {
+    const COMMAND_NAME = 'everything';
+    const COMMAND_DESCRIPTION = 'Execute tests against all composer dependencies';
     /**
      * @var InputInterface
      */
@@ -102,8 +104,8 @@ class EverythingCommand extends Command
         parent::configure();
 
         $this
-            ->setName('everything')
-            ->setDescription('Execute tests against all composer dependencies')
+            ->setName(self::COMMAND_NAME)
+            ->setDescription(self::COMMAND_DESCRIPTION)
         ;
     }
 
