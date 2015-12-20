@@ -234,7 +234,6 @@ class CacheTest extends \PHPUnit_Framework_TestCase
         );
 
         $callCount = 0;
-
         $cache->mirror(['src/', 'tests/'], function() use (&$callCount) {
             $callCount++;
         });

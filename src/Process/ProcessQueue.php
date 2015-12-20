@@ -15,6 +15,7 @@ use Symfony\Component\Process\Process;
 class ProcessQueue extends Collection
 {
     const SLEEP_MICRO_SECONDS = 1000;
+    const PROMISE_KEY = 'promise';
 
     /**
      * @var int
@@ -22,15 +23,32 @@ class ProcessQueue extends Collection
     private $limit;
 
     /**
-     * ProcessQueue constructor.
+     * ProcessQueue constructor
+     *
      * @param array $elements
      * @param int $limit
      */
     public function __construct(array $elements = [], $limit = null)
     {
+        $this->assertProcesses($elements);
+
         parent::__construct($elements);
 
         $this->limit = $limit ?: (new ProcessorCounter())->getCpuCount();
+    }
+
+    /**
+     * Assert that $elements contains valid Processes only
+     *
+     * @param array $elements
+     */
+    private function assertProcesses(array $elements = [])
+    {
+        foreach ($elements as $element) {
+            if (!$element instanceof Process) {
+                throw new Exception\InvalidProcessException($element);
+            }
+        }
     }
 
     /**
@@ -74,7 +92,7 @@ class ProcessQueue extends Collection
     public function resolve(Process $process)
     {
         $options = $process->getOptions();
-        $promise = array_key_exists('promise', $options) ? $options['promise'] : null;
+        $promise = array_key_exists(self::PROMISE_KEY, $options) ? $options[self::PROMISE_KEY] : null;
 
         if ($promise instanceof PromiseInterface) {
             $promise->wait();

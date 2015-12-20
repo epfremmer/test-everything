@@ -66,10 +66,10 @@ class ProcessManagerTest extends \PHPUnit_Framework_TestCase
         $promise->then(function($process) {
             /** @var Process $process */
             $this->assertInstanceOf(Process::class, $process);
-            $this->assertArrayHasKey('promise', $process->getOptions());
+            $this->assertArrayHasKey(ProcessQueue::PROMISE_KEY, $process->getOptions());
 
             /** @var PromiseInterface $promise */
-            $promise = $process->getOptions()['promise'];
+            $promise = $process->getOptions()[ProcessQueue::PROMISE_KEY];
             $this->assertInstanceOf(PromiseInterface::class, $promise);
             $this->assertTrue($process->isTerminated());
             $this->assertTrue($process->isStarted());

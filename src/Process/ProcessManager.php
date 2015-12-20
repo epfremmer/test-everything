@@ -55,7 +55,7 @@ class ProcessManager
 
         $this->queue->add($process);
 
-        $process->setOptions(['promise' => $promise]);
+        $process->setOptions([ProcessQueue::PROMISE_KEY => $promise]);
 
         return $promise;
     }
