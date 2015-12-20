@@ -46,10 +46,9 @@ class CopyProjectFiles
     }
 
     /**
-     * @param Collection $packages
-     * @return Collection
+     * @return mixed
      */
-    public function __invoke(Collection $packages)
+    public function __invoke()
     {
         $paths = array_reduce((array) $this->json->get('autoload'), function($paths, array $psr) {
             return array_merge((array) $paths, array_values($psr));
@@ -59,5 +58,7 @@ class CopyProjectFiles
             $this->progress->advance();
             $this->progress->display();
         });
+
+        return func_get_arg(0);
     }
 }
