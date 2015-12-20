@@ -5,6 +5,7 @@
  * @author Edward Pfremmer <epfremme@nerdery.com>
  */
 namespace Epfremme\Everything\Tests\Handler\Setup;
+
 use Epfremme\Everything\Composer\Json;
 use Epfremme\Everything\Filesystem\Cache;
 use Epfremme\Everything\Handler\Setup\CopyProjectFiles;

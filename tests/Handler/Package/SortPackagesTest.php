@@ -34,10 +34,12 @@ class SortPackagesTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
+        $serializer = $this->getSerializer();
+
         $this->packages = new Collection([
-            'b/b' => $this->getSerializer()->deserialize(str_replace('test/test', 'b/b', PackageTest::TEST_PACKAGE_JSON), Package::class, 'json'),
-            'a/a' => $this->getSerializer()->deserialize(str_replace('test/test', 'a/a', PackageTest::TEST_PACKAGE_JSON), Package::class, 'json'),
-            'c/c' => $this->getSerializer()->deserialize(str_replace('test/test', 'c/c', PackageTest::TEST_PACKAGE_JSON), Package::class, 'json'),
+            'b/b' => $serializer->deserialize(str_replace('test/test', 'b/b', PackageTest::TEST_PACKAGE_JSON), Package::class, 'json'),
+            'a/a' => $serializer->deserialize(str_replace('test/test', 'a/a', PackageTest::TEST_PACKAGE_JSON), Package::class, 'json'),
+            'c/c' => $serializer->deserialize(str_replace('test/test', 'c/c', PackageTest::TEST_PACKAGE_JSON), Package::class, 'json'),
         ]);
     }
 

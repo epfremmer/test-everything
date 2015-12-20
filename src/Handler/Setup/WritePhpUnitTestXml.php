@@ -12,6 +12,12 @@ namespace Epfremme\Everything\Handler\Setup;
 use Epfremme\Everything\Filesystem\Cache;
 use Symfony\Component\Finder\SplFileInfo;
 
+/**
+ * Class WritePhpUnitTestXml
+ *
+ * @deprecated
+ * @package Epfremme\Everything\Handler\Setup
+ */
 class WritePhpUnitTestXml
 {
     /**
