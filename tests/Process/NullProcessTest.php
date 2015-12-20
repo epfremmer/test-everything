@@ -1,16 +1,19 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: epfremme
- * Date: 12/18/15
- * Time: 1:52 AM
+ * File NullProcessTest.php
+ *
+ * @author Edward Pfremmer <epfremme@nerdery.com>
  */
-
 namespace Epfremme\Everything\Tests\Process;
 
 use Epfremme\Everything\Process\NullProcess;
 use Symfony\Component\Process\Process;
 
+/**
+ * Class NullProcessTest
+ *
+ * @package Epfremme\Everything\Tests\Process
+ */
 class NullProcessTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstruct()

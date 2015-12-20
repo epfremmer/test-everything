@@ -1,14 +1,16 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: epfremme
- * Date: 12/18/15
- * Time: 1:53 AM
+ * File ProcessQueueTest.php
+ *
+ * @author Edward Pfremmer <epfremme@nerdery.com>
  */
-
 namespace Epfremme\Everything\Tests\Process;
 
-
+/**
+ * Class ProcessQueueTest
+ *
+ * @package Epfremme\Everything\Tests\Process
+ */
 class ProcessQueueTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstruct()

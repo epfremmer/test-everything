@@ -67,7 +67,7 @@ class ProcessManager
         /** @var Process $next */
         foreach ($queue() as $next) {
             $next->start();
-            $tick();
+            $tick && $tick();
         }
     }
 }

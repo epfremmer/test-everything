@@ -1,17 +1,20 @@
 <?php
 /**
- * Created by IntelliJ IDEA.
- * User: epfremme
- * Date: 12/18/15
- * Time: 1:52 AM
+ * File ProcessFactoryTest.php
+ *
+ * @author Edward Pfremmer <epfremme@nerdery.com>
  */
-
 namespace Epfremme\Everything\Tests\Process;
 
 use Epfremme\Everything\Process\ProcessFactory;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Process;
 
+/**
+ * Class ProcessFactoryTest
+ *
+ * @package Epfremme\Everything\Tests\Process
+ */
 class ProcessFactoryTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstruct()
@@ -25,7 +28,7 @@ class ProcessFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $factory = new ProcessFactory('pwd');
 
-        /** @var SplFileInfo $fileinfo */
+        /** @var SplFileInfo|\Mockery\MockInterface $fileinfo */
         $fileinfo = \Mockery::mock(SplFileInfo::class);
         $process = $factory->make($fileinfo);
 
