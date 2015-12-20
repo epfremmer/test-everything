@@ -10,6 +10,7 @@ namespace Epfremme\Everything\Subscriber;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Epfremme\Everything\Annotation\Inline;
+use Epfremme\Everything\Entity\Package;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\PreDeserializeEvent;
@@ -35,19 +36,14 @@ class SerializationSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            ['event' => Events::PRE_DESERIALIZE, 'method' => 'onPreDeserialize'],
+            ['event' => Events::PRE_DESERIALIZE, 'class' => Package::class, 'method' => 'onPreDeserialize'],
         ];
     }
 
     public function onPreDeserialize(PreDeserializeEvent $event)
     {
         $class = $event->getType()['name'];
-
-        if (!class_exists($class)) {
-            return; // skip custom JMS types
-        }
-
-        $data   = $event->getData();
+        $data = $event->getData();
         $object = new \ReflectionClass($class);
         $inline = $this->reader->getClassAnnotation($object, Inline::class);
 
