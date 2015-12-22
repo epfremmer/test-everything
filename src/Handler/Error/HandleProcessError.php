@@ -33,7 +33,7 @@ class HandleProcessError
      * Handle parsing failed process error output
      *
      * @param Process $process
-     * @return Process
+     * @return TestResult
      */
     public function __invoke(Process $process)
     {
