@@ -220,7 +220,7 @@ class EverythingCommand extends Command
             ->then(new Handler\Output\StartProgressBar($this->progress, $this->cache))
             ->wait();
 
-        $this->cache->each(function (SplFileInfo $directory) use ($processManager, $resultsParser) {
+        $this->cache->each(function(SplFileInfo $directory) use ($processManager, $resultsParser) {
             $promise = $processManager->enqueue($directory)
                 ->then(new Handler\Output\AdvanceProgressBar($this->progress))
                 ->then(new Handler\Test\ParseTestResults($resultsParser))
@@ -230,7 +230,7 @@ class EverythingCommand extends Command
             $this->promises->push($promise);
         });
 
-        $processManager->run(function () {
+        $processManager->run(function() {
             $this->progress->display();
         });
     }
